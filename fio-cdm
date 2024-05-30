@@ -26,9 +26,14 @@ class Job:
         self._testfile_name = '.fio_testmark'
         self._blocksize = {'seq': '1m', 'rnd': '4k'}
         self._config = configparser.ConfigParser(allow_no_value=True)
+        self.ioengine = 'windowsaio'
+        if os.name == 'nt':
+            self.ioengine = 'windowsaio'
+        elif os.name == 'posix': # macOS
+            self.ioengine = 'posixaio'
         self._config.read_dict({
             'global': {
-                'ioengine': 'windowsaio' if os.name == 'nt' else 'libaio',
+                'ioengine': self.ioengine,
                 'filename': self._testfile_name,
                 # escape colons, see man page 'filename'
                 'directory': args.target.replace(':', r'\:'),
